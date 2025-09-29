@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  bio       String?
+  skills    String[]
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  authoredProjects     Project[]
+  contributions        Contribution[]
+  sentRatings          Rating[] @relation("RatingSender")
+  receivedRatings      Rating[] @relation("RatingReceiver")
+  chatMessages         ChatMessage[]
+  notifications        Notification[]
+  projectMemberships   ProjectMember[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  purpose     String?
+  technologies String[]
+  tasks       String[]
+  githubLink  String?
+  status      ProjectStatus @default(PENDING)
+  price       Float?
+  authorId    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  author        User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  contributions Contribution[]
+  attachments   Attachment[]
+  chatMessages  ChatMessage[]
+  members       ProjectMember[]
+
+  @@map("projects")
+}
+
+model Contribution {
+  id        String            @id @default(cuid())
+  projectId String
+  userId    String
+  status    ContributionStatus @default(PENDING)
+  message   String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("contributions")
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  role      MemberRole @default(CONTRIBUTOR)
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  senderId  String
+  receiverId String
+  projectId String?
+  rating    Int      // 1-5 stars
+  comment   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  sender   User @relation("RatingSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("RatingReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId, projectId])
+  @@map("ratings")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  content   String
+  isCommand Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  projectId String
+  filename  String
+  originalName String
+  mimeType  String
+  size      Int
+  url       String
+  createdAt DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  data      Json?
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// Enums
+enum ProjectStatus {
+  PENDING
+  ACTIVE
+  FULFILLED
+  CANCELLED
+}
+
+enum ContributionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+enum MemberRole {
+  AUTHOR
+  CONTRIBUTOR
+  ADMIN
+}
+
+enum NotificationType {
+  CONTRIBUTION_REQUEST
+  CONTRIBUTION_ACCEPTED
+  CONTRIBUTION_REJECTED
+  PROJECT_UPDATE
+  CHAT_MESSAGE
+  RATING_RECEIVED
+  SYSTEM
+}
