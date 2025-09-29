@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Filter, Grid, List, Plus } from 'lucide-react'
+import { Search, Filter, Grid2x2 as Grid, List, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Navbar } from '@/components/layout/Navbar'
