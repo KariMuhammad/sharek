@@ -5,7 +5,7 @@ import transporter from '../../config/email';
 
 export const contributionController = {
   requestContribution: async (req: Request, res: Response): Promise<void> => {
-    const { projectId } = req.params;
+    const { projectId } = req.body;
     if (!projectId) {
       throw new Error("Missing projectId");
     }

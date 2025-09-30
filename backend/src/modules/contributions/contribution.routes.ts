@@ -26,10 +26,10 @@ const updateContributionValidation = [
 ];
 
 // Routes
-router.post('/request/:projectId', authenticateToken, requestContributionValidation, validateRequest, asyncHandler(contributionController.requestContribution));
+router.post('/', authenticateToken, requestContributionValidation, validateRequest, asyncHandler(contributionController.requestContribution));
 router.get('/my-requests', authenticateToken, asyncHandler(contributionController.getMyRequests));
 router.get('/project/:projectId', authenticateToken, asyncHandler(contributionController.getProjectContributions));
-router.put('/:contributionId', authenticateToken, updateContributionValidation, validateRequest, asyncHandler(contributionController.updateContribution));
+router.patch('/:contributionId', authenticateToken, updateContributionValidation, validateRequest, asyncHandler(contributionController.updateContribution));
 router.delete('/:contributionId', authenticateToken, asyncHandler(contributionController.cancelContribution));
 
 export default router;

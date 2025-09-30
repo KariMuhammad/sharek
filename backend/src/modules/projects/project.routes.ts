@@ -72,10 +72,10 @@ const updateProjectValidation = [
 ];
 
 // Routes
-router.get('/', authenticateToken, asyncHandler(projectController.getAllProjects));
-router.get('/search', authenticateToken, asyncHandler(projectController.searchProjects));
-router.get('/trending', authenticateToken, asyncHandler(projectController.getTrendingProjects));
-router.get('/:projectId', authenticateToken, asyncHandler(projectController.getProject));
+router.get('/', asyncHandler(projectController.getAllProjects)); // Allow browsing without auth
+router.get('/search', asyncHandler(projectController.searchProjects)); // Allow searching without auth
+router.get('/trending', asyncHandler(projectController.getTrendingProjects)); // Allow trending without auth
+router.get('/:projectId', asyncHandler(projectController.getProject)); // Allow viewing project details without auth
 router.post('/', authenticateToken, createProjectValidation, validateRequest, asyncHandler(projectController.createProject));
 router.put('/:projectId', authenticateToken, updateProjectValidation, validateRequest, asyncHandler(projectController.updateProject));
 router.delete('/:projectId', authenticateToken, asyncHandler(projectController.deleteProject));

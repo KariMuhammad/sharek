@@ -113,7 +113,7 @@ export const authController = {
 
     try {
       const decoded = verifyToken(refreshToken, true) as { userId: string };
-      
+
       const user = await prisma.user.findUnique({
         where: { id: decoded.userId },
         select: {
@@ -201,7 +201,7 @@ export const authController = {
 
     // Send email
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    
+
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: user.email,
@@ -228,7 +228,7 @@ export const authController = {
 
     try {
       const decoded = verifyToken(token) as { userId: string };
-      
+
       const hashedPassword = await hashPassword(newPassword);
 
       await prisma.user.update({
@@ -243,5 +243,38 @@ export const authController = {
     } catch (error) {
       throw new CustomError('Invalid or expired reset token', 400);
     }
+  },
+
+  getMe: async (req: Request, res: Response): Promise<void> => {
+    const userId = (req as any).user.id;
+    console.log('Auth Controller: getMe called for userId:', userId);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        bio: true,
+        skills: true,
+        avatar: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    console.log('Auth Controller: User found:', !!user);
+
+    if (!user) {
+      throw new CustomError('User not found', 404);
+    }
+
+    res.json({
+      success: true,
+      data: { user },
+    });
   },
 };

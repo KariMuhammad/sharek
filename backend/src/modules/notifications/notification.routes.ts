@@ -23,18 +23,18 @@ const createNotificationValidation = [
     .withMessage('Data must be an object'),
 ];
 
-const markAsReadValidation = [
-  body('notificationIds')
-    .isArray()
-    .withMessage('Notification IDs must be an array'),
-];
+// const markAsReadValidation = [
+//   body('notificationIds')
+//     .isArray()
+//     .withMessage('Notification IDs must be an array'),
+// ];
 
 // Routes
 router.get('/', authenticateToken, asyncHandler(notificationController.getNotifications));
 router.get('/unread-count', authenticateToken, asyncHandler(notificationController.getUnreadCount));
 router.post('/', authenticateToken, createNotificationValidation, validateRequest, asyncHandler(notificationController.createNotification));
-router.put('/mark-read', authenticateToken, markAsReadValidation, validateRequest, asyncHandler(notificationController.markAsRead));
-router.put('/mark-all-read', authenticateToken, asyncHandler(notificationController.markAllAsRead));
+router.patch('/:notificationId/read', authenticateToken, asyncHandler(notificationController.markAsRead));
+router.patch('/read-all', authenticateToken, asyncHandler(notificationController.markAllAsRead));
 router.delete('/:notificationId', authenticateToken, asyncHandler(notificationController.deleteNotification));
 
 export default router;

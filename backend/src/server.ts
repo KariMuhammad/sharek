@@ -20,6 +20,7 @@ import projectRoutes from './modules/projects/project.routes';
 import contributionRoutes from './modules/contributions/contribution.routes';
 import chatRoutes from './modules/chat/chat.routes';
 import notificationRoutes from './modules/notifications/notification.routes';
+import ratingRoutes from './modules/ratings/rating.routes';
 
 const app = express();
 const server = createServer(app);
@@ -90,6 +91,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/contributions', contributionRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/ratings', ratingRoutes);
 
 // Error handling middleware
 app.use(notFoundHandler);

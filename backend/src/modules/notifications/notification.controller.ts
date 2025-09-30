@@ -76,11 +76,14 @@ export const notificationController = {
 
     markAsRead: async (req: Request, res: Response): Promise<void> => {
         const userId = (req as any).user.id;
-        const { notificationIds } = req.body;
+        const { notificationId } = req.params;
+        if (!notificationId) {
+            throw new Error("Missing notificationId")
+        }
 
         await prisma.notification.updateMany({
             where: {
-                id: { in: notificationIds },
+                id: notificationId,
                 userId,
             },
             data: { isRead: true },
@@ -88,7 +91,7 @@ export const notificationController = {
 
         res.json({
             success: true,
-            message: 'Notifications marked as read',
+            message: 'Notification marked as read',
         });
     },
 
@@ -111,6 +114,10 @@ export const notificationController = {
 
     deleteNotification: async (req: Request, res: Response): Promise<void> => {
         const { notificationId } = req.params;
+        if (!notificationId) {
+            throw new Error("Missing notificationId")
+        }
+
         const userId = (req as any).user.id;
 
         const notification = await prisma.notification.findUnique({

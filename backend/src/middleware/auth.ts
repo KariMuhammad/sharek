@@ -20,13 +20,16 @@ export const authenticateToken = async (
   try {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
+    console.log('Auth Middleware: Token present:', !!token);
 
     if (!token) {
+      console.log('Auth Middleware: No token provided');
       throw new CustomError('Access token required', 401);
     }
 
     const decoded = jwt.verify(token, config.JWT_SECRET) as { userId: string };
-    
+    console.log('Auth Middleware: Token decoded for userId:', decoded.userId);
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
@@ -37,13 +40,17 @@ export const authenticateToken = async (
       },
     });
 
+    console.log('Auth Middleware: User found:', !!user, 'isActive:', user?.isActive);
+
     if (!user || !user.isActive) {
+      console.log('Auth Middleware: User not found or inactive');
       throw new CustomError('User not found or inactive', 401);
     }
 
     req.user = user;
     next();
   } catch (error) {
+    console.log('Auth Middleware: Error:', error);
     if (error instanceof jwt.JsonWebTokenError) {
       next(new CustomError('Invalid token', 401));
     } else if (error instanceof jwt.TokenExpiredError) {
@@ -69,7 +76,7 @@ export const optionalAuth = async (
     }
 
     const decoded = jwt.verify(token, config.JWT_SECRET) as { userId: string };
-    
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {

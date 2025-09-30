@@ -56,6 +56,7 @@ router.post('/register', registerValidation, validateRequest, asyncHandler(authC
 router.post('/login', loginValidation, validateRequest, asyncHandler(authController.login));
 router.post('/refresh', asyncHandler(authController.refreshToken));
 router.post('/logout', authenticateToken, asyncHandler(authController.logout));
+router.get('/me', authenticateToken, asyncHandler(authController.getMe));
 router.post('/change-password', authenticateToken, changePasswordValidation, validateRequest, asyncHandler(authController.changePassword));
 router.post('/forgot-password', asyncHandler(authController.forgotPassword));
 router.post('/reset-password', asyncHandler(authController.resetPassword));

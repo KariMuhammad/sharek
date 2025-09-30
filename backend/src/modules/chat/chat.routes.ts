@@ -19,8 +19,8 @@ const sendMessageValidation = [
 ];
 
 // Routes
-router.get('/:projectId/messages', authenticateToken, asyncHandler(chatController.getMessages));
-router.post('/:projectId/messages', authenticateToken, sendMessageValidation, validateRequest, asyncHandler(chatController.sendMessage));
+router.get('/:projectId', authenticateToken, asyncHandler(chatController.getMessages));
+router.post('/:projectId', authenticateToken, sendMessageValidation, validateRequest, asyncHandler(chatController.sendMessage));
 router.delete('/messages/:messageId', authenticateToken, asyncHandler(chatController.deleteMessage));
 
 export default router;

@@ -5,10 +5,18 @@ import { CustomError } from '../../middleware/errorHandler';
 
 export const projectController = {
   getAllProjects: async (req: Request, res: Response): Promise<void> => {
-    const { page = 1, limit = 10, status, technologies } = req.query;
+    const { page = 1, limit = 10, status, technologies, search } = req.query;
 
     const skip = (Number(page) - 1) * Number(limit);
     const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search as string, mode: 'insensitive' } },
+        { description: { contains: search as string, mode: 'insensitive' } },
+        { purpose: { contains: search as string, mode: 'insensitive' } },
+      ];
+    }
 
     if (status) {
       where.status = status;
@@ -34,6 +42,13 @@ export const projectController = {
               avatar: true,
             },
           },
+          members: {
+            select: {
+              id: true,
+              userId: true,
+              role: true,
+            },
+          },
           _count: {
             select: {
               contributions: true,
@@ -50,14 +65,12 @@ export const projectController = {
 
     res.json({
       success: true,
-      data: {
-        projects,
-        pagination: {
-          page: Number(page),
-          limit: Number(limit),
-          total,
-          pages: Math.ceil(total / Number(limit)),
-        },
+      data: projects,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages: Math.ceil(total / Number(limit)),
       },
     });
   },
@@ -184,6 +197,19 @@ export const projectController = {
             skills: true,
           },
         },
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+                avatar: true,
+              },
+            },
+          },
+        },
         attachments: true,
         _count: {
           select: {
@@ -200,7 +226,7 @@ export const projectController = {
 
     res.json({
       success: true,
-      data: { project },
+      data: project,
     });
   },
 
