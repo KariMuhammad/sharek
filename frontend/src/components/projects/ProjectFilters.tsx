@@ -1,169 +1,193 @@
-'use client'
+@@ .. @@
+ 'use client';
 
-import { useState } from 'react'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+-import { useState } from 'react';
++import { useTranslations } from 'next-intl';
+ import { Filter, X } from 'lucide-react';
+ import Button from '@/components/ui/Button';
+ import Badge from '@/components/ui/Badge';
 
-interface ProjectFiltersProps {
-  filters: {
-    status: string
-    technologies: string[]
-    priceRange: number[]
-    sortBy: string
-  }
-  onFilterChange: (filters: any) => void
-}
+ interface ProjectFiltersProps {
+-  onFilterChange: (filters: any) => void;
++  filters: {
++    search: string;
++    status: string;
++    technologies: string[];
++    page: number;
++    limit: number;
++  };
++  onFilterChange: (filters: Partial<ProjectFiltersProps['filters']>) => void;
+ }
 
-const statusOptions = [
-  { value: '', label: 'All Status' },
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'FULFILLED', label: 'Fulfilled' },
-]
+-export default function ProjectFilters({ onFilterChange }: ProjectFiltersProps) {
+-  const [selectedStatus, setSelectedStatus] = useState('');
+-  const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>([]);
+-  const [priceRange, setPriceRange] = useState([0, 1000]);
++export default function ProjectFilters({ filters, onFilterChange }: ProjectFiltersProps) {
++  const t = useTranslations('projects.filters');
 
-const technologyOptions = [
-  'JavaScript', 'TypeScript', 'React', 'Vue.js', 'Angular', 'Node.js',
-  'Python', 'Django', 'Flask', 'Java', 'Spring', 'C#', '.NET',
-  'PHP', 'Laravel', 'Ruby', 'Rails', 'Go', 'Rust', 'Swift',
-  'Kotlin', 'Flutter', 'React Native', 'MongoDB', 'PostgreSQL',
-  'MySQL', 'Redis', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP'
-]
+   const statusOptions = [
+-    { value: '', label: 'All' },
+-    { value: 'pending', label: 'Pending' },
+-    { value: 'active', label: 'Active' },
+-    { value: 'completed', label: 'Completed' },
++    { value: '', label: t('all') },
++    { value: 'PENDING', label: t('pending') },
++    { value: 'ACTIVE', label: t('active') },
++    { value: 'FULFILLED', label: t('fulfilled') },
+   ];
 
-export function ProjectFilters({ filters, onFilterChange }: ProjectFiltersProps) {
-  const [localFilters, setLocalFilters] = useState(filters)
+   const technologyOptions = [
+     'React', 'Vue.js', 'Angular', 'Node.js', 'Python', 'Django',
+     'Express', 'MongoDB', 'PostgreSQL', 'MySQL', 'TypeScript',
+     'JavaScript', 'PHP', 'Laravel', 'Ruby', 'Rails', 'Java',
+     'Spring', 'C#', '.NET', 'Go', 'Rust', 'Swift', 'Kotlin'
+   ];
 
-  const handleStatusChange = (status: string) => {
-    const newFilters = { ...localFilters, status }
-    setLocalFilters(newFilters)
-    onFilterChange(newFilters)
-  }
+   const handleStatusChange = (status: string) => {
+-    setSelectedStatus(status);
+-    onFilterChange({ status });
++    onFilterChange({ status });
+   };
 
-  const handleTechnologyToggle = (tech: string) => {
-    const technologies = localFilters.technologies.includes(tech)
-      ? localFilters.technologies.filter(t => t !== tech)
-      : [...localFilters.technologies, tech]
-    
-    const newFilters = { ...localFilters, technologies }
-    setLocalFilters(newFilters)
-    onFilterChange(newFilters)
-  }
+   const handleTechnologyToggle = (tech: string) => {
+-    const newTechnologies = selectedTechnologies.includes(tech)
+-      ? selectedTechnologies.filter(t => t !== tech)
+-      : [...selectedTechnologies, tech];
+-    
+-    setSelectedTechnologies(newTechnologies);
+-    onFilterChange({ technologies: newTechnologies });
++    const newTechnologies = filters.technologies.includes(tech)
++      ? filters.technologies.filter(t => t !== tech)
++      : [...filters.technologies, tech];
++    
++    onFilterChange({ technologies: newTechnologies });
+   };
 
-  const handlePriceRangeChange = (range: number[]) => {
-    const newFilters = { ...localFilters, priceRange: range }
-    setLocalFilters(newFilters)
-    onFilterChange(newFilters)
-  }
+   const clearFilters = () => {
+-    setSelectedStatus('');
+-    setSelectedTechnologies([]);
+-    setPriceRange([0, 1000]);
+-    onFilterChange({ status: '', technologies: [], priceRange: [0, 1000] });
++    onFilterChange({ 
++      status: '', 
++      technologies: [],
++      search: ''
++    });
+   };
 
-  const clearFilters = () => {
-    const newFilters = {
-      status: '',
-      technologies: [],
-      priceRange: [0, 1000],
-      sortBy: 'newest',
-    }
-    setLocalFilters(newFilters)
-    onFilterChange(newFilters)
-  }
+   return (
+     <div className="bg-white rounded-xl p-6 shadow-sm">
+       <div className="flex items-center justify-between mb-6">
+         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+           <Filter className="w-5 h-5" />
+-          Filters
++          {t('filter')}
+         </h3>
+         <Button variant="ghost" size="sm" onClick={clearFilters}>
+-          Clear All
++          {t('clear')}
+         </Button>
+       </div>
 
-  return (
-    <div className="space-y-6">
-      {/* Status Filter */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Status</h3>
-        <div className="flex flex-wrap gap-2">
-          {statusOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => handleStatusChange(option.value)}
-              className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                localFilters.status === option.value
-                  ? 'bg-primary-100 border-primary-300 text-primary-700'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
+       {/* Status Filter */}
+       <div className="mb-6">
+-        <h4 className="text-sm font-medium text-gray-900 mb-3">Status</h4>
++        <h4 className="text-sm font-medium text-gray-900 mb-3">{t('status')}</h4>
+         <div className="space-y-2">
+           {statusOptions.map((option) => (
+             <label key={option.value} className="flex items-center">
+               <input
+                 type="radio"
+                 name="status"
+                 value={option.value}
+-                checked={selectedStatus === option.value}
++                checked={filters.status === option.value}
+                 onChange={() => handleStatusChange(option.value)}
+                 className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+               />
+               <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+             </label>
+           ))}
+         </div>
+       </div>
 
-      {/* Technology Filter */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Technologies</h3>
-        <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-          {technologyOptions.map((tech) => (
-            <button
-              key={tech}
-              onClick={() => handleTechnologyToggle(tech)}
-              className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                localFilters.technologies.includes(tech)
-                  ? 'bg-primary-100 border-primary-300 text-primary-700'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {tech}
-            </button>
-          ))}
-        </div>
-        {localFilters.technologies.length > 0 && (
-          <div className="mt-3">
-            <p className="text-sm text-gray-600 mb-2">Selected technologies:</p>
-            <div className="flex flex-wrap gap-1">
-              {localFilters.technologies.map((tech) => (
-                <Badge key={tech} variant="primary" size="sm">
-                  {tech}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+       {/* Technologies Filter */}
+       <div className="mb-6">
+-        <h4 className="text-sm font-medium text-gray-900 mb-3">Technologies</h4>
++        <h4 className="text-sm font-medium text-gray-900 mb-3">{t('technologies')}</h4>
+         <div className="max-h-48 overflow-y-auto space-y-2">
+           {technologyOptions.map((tech) => (
+             <label key={tech} className="flex items-center">
+               <input
+                 type="checkbox"
+-                checked={selectedTechnologies.includes(tech)}
++                checked={filters.technologies.includes(tech)}
+                 onChange={() => handleTechnologyToggle(tech)}
+                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+               />
+               <span className="ml-2 text-sm text-gray-700">{tech}</span>
+             </label>
+           ))}
+         </div>
+       </div>
 
-      {/* Price Range Filter */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Price Range</h3>
-        <div className="space-y-3">
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <label className="block text-xs text-gray-600 mb-1">Min Price</label>
-              <input
-                type="number"
-                min="0"
-                max="10000"
-                value={localFilters.priceRange[0]}
-                onChange={(e) => handlePriceRangeChange([parseInt(e.target.value) || 0, localFilters.priceRange[1]])}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs text-gray-600 mb-1">Max Price</label>
-              <input
-                type="number"
-                min="0"
-                max="10000"
-                value={localFilters.priceRange[1]}
-                onChange={(e) => handlePriceRangeChange([localFilters.priceRange[0], parseInt(e.target.value) || 1000])}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-          </div>
-          <div className="text-sm text-gray-600">
-            ${localFilters.priceRange[0]} - ${localFilters.priceRange[1]}
-          </div>
-        </div>
-      </div>
+-      {/* Price Range Filter */}
+-      <div className="mb-6">
+-        <h4 className="text-sm font-medium text-gray-900 mb-3">Price Range</h4>
+-        <div className="space-y-3">
+-          <div className="flex items-center gap-2">
+-            <input
+-              type="number"
+-              placeholder="Min"
+-              value={priceRange[0]}
+-              onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+-            />
+-            <span className="text-gray-500">-</span>
+-            <input
+-              type="number"
+-              placeholder="Max"
+-              value={priceRange[1]}
+-              onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 1000])}
+-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+-            />
+-          </div>
+-        </div>
+-      </div>
 
-      {/* Clear Filters */}
-      <div className="pt-4 border-t border-gray-200">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={clearFilters}
-          className="w-full"
-        >
-          Clear All Filters
-        </Button>
-      </div>
-    </div>
-  )
-}
+       {/* Active Filters */}
+-      {(selectedStatus || selectedTechnologies.length > 0) && (
++      {(filters.status || filters.technologies.length > 0) && (
+         <div>
+           <h4 className="text-sm font-medium text-gray-900 mb-3">Active Filters</h4>
+           <div className="flex flex-wrap gap-2">
+-            {selectedStatus && (
++            {filters.status && (
+               <Badge variant="secondary" className="flex items-center gap-1">
+-                Status: {statusOptions.find(s => s.value === selectedStatus)?.label}
++                {t('status')}: {statusOptions.find(s => s.value === filters.status)?.label}
+                 <button
+                   onClick={() => handleStatusChange('')}
+                   className="ml-1 hover:text-red-600"
+                 >
+                   <X className="w-3 h-3" />
+                 </button>
+               </Badge>
+             )}
+-            {selectedTechnologies.map((tech) => (
++            {filters.technologies.map((tech) => (
+               <Badge key={tech} variant="secondary" className="flex items-center gap-1">
+                 {tech}
+                 <button
+                   onClick={() => handleTechnologyToggle(tech)}
+                   className="ml-1 hover:text-red-600"
+                 >
+                   <X className="w-3 h-3" />
+                 </button>
+               </Badge>
+             ))}
+           </div>
+         </div>
+       )}
+     </div>

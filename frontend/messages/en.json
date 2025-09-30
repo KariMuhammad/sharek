@@ -1,0 +1,172 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close"
+  },
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "createProject": "Create Project"
+  },
+  "home": {
+    "hero": {
+      "title": "Connect, Collaborate, Create",
+      "subtitle": "Join the ultimate platform for developers to find projects, contribute to amazing ideas, and build the future together.",
+      "cta": "Start Contributing",
+      "secondary": "Browse Projects"
+    },
+    "features": {
+      "title": "Why Choose Sharek?",
+      "subtitle": "Everything you need to collaborate and contribute effectively",
+      "projectDiscovery": {
+        "title": "Project Discovery",
+        "description": "Find projects that match your skills and interests with our advanced search and filtering system."
+      },
+      "realTimeChat": {
+        "title": "Real-time Collaboration",
+        "description": "Communicate with project authors and team members through integrated chat and notifications."
+      },
+      "skillMatching": {
+        "title": "Smart Matching",
+        "description": "Get matched with projects that align with your expertise and career goals."
+      },
+      "ratingSystem": {
+        "title": "Rating System",
+        "description": "Build your reputation through peer reviews and showcase your contribution quality."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Get started in three simple steps",
+      "step1": {
+        "title": "Browse Projects",
+        "description": "Explore projects across different technologies and find ones that interest you."
+      },
+      "step2": {
+        "title": "Request to Join",
+        "description": "Send a contribution request with your message to the project author."
+      },
+      "step3": {
+        "title": "Start Contributing",
+        "description": "Once accepted, join the project chat and start collaborating with the team."
+      }
+    },
+    "testimonials": {
+      "title": "Top Contributors",
+      "subtitle": "Meet our amazing community of developers who are making a difference"
+    },
+    "trending": {
+      "title": "Trending Projects",
+      "subtitle": "Discover the most popular projects in our community",
+      "viewAll": "View All Projects"
+    },
+    "stats": {
+      "projects": "Active Projects",
+      "developers": "Developers",
+      "contributions": "Contributions",
+      "countries": "Countries"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account to continue",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "register": {
+      "title": "Join Sharek",
+      "subtitle": "Create your account and start contributing",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "projects": {
+    "title": "Discover Projects",
+    "subtitle": "Find amazing projects to contribute to",
+    "filters": {
+      "search": "Search projects...",
+      "status": "Status",
+      "technologies": "Technologies",
+      "priceRange": "Price Range",
+      "all": "All",
+      "pending": "Pending",
+      "active": "Active",
+      "fulfilled": "Fulfilled"
+    },
+    "card": {
+      "author": "by",
+      "members": "members",
+      "contributions": "contributions",
+      "requestToJoin": "Request to Join",
+      "viewDetails": "View Details"
+    },
+    "empty": {
+      "title": "No projects found",
+      "description": "Try adjusting your search criteria or browse all projects."
+    }
+  },
+  "project": {
+    "details": "Project Details",
+    "description": "Description",
+    "purpose": "Purpose",
+    "technologies": "Technologies",
+    "tasks": "Tasks",
+    "githubLink": "GitHub Repository",
+    "price": "Budget",
+    "status": "Status",
+    "author": "Project Author",
+    "members": "Team Members",
+    "requestToJoin": "Request to Join",
+    "joinRequested": "Request Sent",
+    "chat": "Project Chat",
+    "contributions": "Contributions"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "myProjects": "My Projects",
+    "myContributions": "My Contributions",
+    "recentActivity": "Recent Activity",
+    "createProject": "Create New Project"
+  },
+  "profile": {
+    "title": "Profile",
+    "edit": "Edit Profile",
+    "bio": "Bio",
+    "skills": "Skills",
+    "projects": "Projects",
+    "contributions": "Contributions",
+    "ratings": "Ratings",
+    "averageRating": "Average Rating"
+  }
+}

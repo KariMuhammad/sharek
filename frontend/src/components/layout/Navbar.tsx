@@ -1,186 +1,224 @@
-'use client'
+@@ .. @@
+ 'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useAuth } from '@/contexts/AuthContext'
-import { Menu, X, Search, Bell, User, LogOut, Settings, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Avatar } from '@/components/ui/Avatar'
-import { Dropdown } from '@/components/ui/Dropdown'
-import { NotificationDropdown } from '@/components/notifications/NotificationDropdown'
+-import { useState } from 'react';
++import { useState, useEffect } from 'react';
++import { useTranslations, useLocale } from 'next-intl';
++import { usePathname } from 'next/navigation';
+ import Link from 'next/link';
+-import { Menu, X, Bell, User, LogOut, Settings } from 'lucide-react';
++import { Menu, X, Bell, User, LogOut, Settings, Plus } from 'lucide-react';
++import { useAuth } from '@/hooks/useAuth';
++import { useNotifications } from '@/hooks/useNotifications';
+ import Button from '@/components/ui/Button';
+ import Avatar from '@/components/ui/Avatar';
+ import Dropdown from '@/components/ui/Dropdown';
+ import NotificationDropdown from '@/components/notifications/NotificationDropdown';
++import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
++import { type Locale } from '@/lib/i18n';
 
-export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { user, logout, isAuthenticated } = useAuth()
+ export default function Navbar() {
++  const t = useTranslations('nav');
++  const locale = useLocale() as Locale;
++  const pathname = usePathname();
+   const [isOpen, setIsOpen] = useState(false);
+-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This would come from auth context
++  const { user, isAuthenticated, logout } = useAuth();
++  const { unreadCount } = useNotifications();
++
++  // Close mobile menu when route changes
++  useEffect(() => {
++    setIsOpen(false);
++  }, [pathname]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+   const navigation = [
+-    { name: 'Home', href: '/' },
+-    { name: 'Projects', href: '/projects' },
+-    { name: 'About', href: '/about' },
++    { name: t('home'), href: `/${locale}` },
++    { name: t('projects'), href: `/${locale}/projects` },
+   ];
 
-  return (
-    <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">S</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Sharek</span>
-            </Link>
-          </div>
+   const userMenuItems = [
+-    { name: 'Profile', href: '/profile', icon: User },
+-    { name: 'Settings', href: '/settings', icon: Settings },
++    { name: t('dashboard'), href: `/${locale}/dashboard`, icon: User },
++    { name: t('profile'), href: `/${locale}/profile`, icon: User },
++    { name: 'Settings', href: `/${locale}/settings`, icon: Settings },
+   ];
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/projects" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Explore Projects
-            </Link>
-            <Link href="/trending" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Trending
-            </Link>
-            <Link href="/about" className="text-gray-700 hover:text-primary-600 transition-colors">
-              About
-            </Link>
-          </div>
++  const handleLogout = async () => {
++    await logout();
++  };
++
+   return (
+     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+@@ .. @@
+           <div className="flex items-center">
+             <Link href="/" className="flex items-center">
+               <div className="flex items-center gap-2">
+                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                   <span className="text-white font-bold text-sm">S</span>
+                 </div>
+                 <span className="text-xl font-bold text-gray-900">Sharek</span>
+               </div>
+             </Link>
+           </div>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search projects..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-              />
-            </div>
-          </div>
+           {/* Desktop Navigation */}
+           <div className="hidden md:block">
+             <div className="ml-10 flex items-baseline space-x-4">
+               {navigation.map((item) => (
+                 <Link
+                   key={item.name}
+                   href={item.href}
+-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
++                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
++                    pathname === item.href
++                      ? 'text-blue-600 bg-blue-50'
++                      : 'text-gray-600 hover:text-gray-900'
++                  }`}
+                 >
+                   {item.name}
+                 </Link>
+               ))}
+             </div>
+           </div>
 
-          {/* User Actions */}
-          <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                <Button
-                  as={Link}
-                  href="/projects/new"
-                  variant="primary"
-                  size="sm"
-                  className="hidden md:flex"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Project
-                </Button>
-
-                <NotificationDropdown />
-
-                <Dropdown
-                  trigger={
-                    <button className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 transition-colors">
-                      <Avatar
-                        src={user?.avatar}
-                        alt={user?.username || 'User'}
-                        size="sm"
-                      />
-                    </button>
-                  }
-                >
-                  <div className="py-1">
-                    <Link
-                      href="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      <User className="w-4 h-4 mr-3" />
-                      Profile
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      <Settings className="w-4 h-4 mr-3" />
-                      Settings
-                    </Link>
-                    <hr className="my-1" />
-                    <button
-                      onClick={logout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      <LogOut className="w-4 h-4 mr-3" />
-                      Sign Out
-                    </button>
-                  </div>
-                </Dropdown>
-              </>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Button as={Link} href="/login" variant="outline" size="sm">
-                  Sign In
-                </Button>
-                <Button as={Link} href="/register" variant="primary" size="sm">
-                  Get Started
-                </Button>
-              </div>
-            )}
-
-            {/* Mobile menu button */}
-            <button
-              onClick={toggleMenu}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search projects..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
-              
-              <Link
-                href="/projects"
-                className="text-gray-700 hover:text-primary-600 py-2 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Explore Projects
-              </Link>
-              <Link
-                href="/trending"
-                className="text-gray-700 hover:text-primary-600 py-2 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Trending
-              </Link>
-              <Link
-                href="/about"
-                className="text-gray-700 hover:text-primary-600 py-2 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </Link>
-
-              {isAuthenticated && (
-                <Button
-                  as={Link}
-                  href="/projects/new"
-                  variant="primary"
-                  size="sm"
-                  className="mt-4"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Project
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    </nav>
-  )
-}
+           {/* Desktop Right Side */}
+           <div className="hidden md:flex items-center space-x-4">
+-            {isLoggedIn ? (
++            <LanguageSwitcher currentLocale={locale} />
++            
++            {isAuthenticated ? (
+               <>
++                <Button href={`/${locale}/projects/create`} size="sm">
++                  <Plus className="w-4 h-4 mr-2" />
++                  {t('createProject')}
++                </Button>
++                
+                 <NotificationDropdown />
+                 
+                 <Dropdown
+                   trigger={
+                     <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors">
+-                      <Avatar size="sm" />
++                      <Avatar 
++                        src={user?.avatar} 
++                        alt={user?.username} 
++                        size="sm" 
++                      />
+                     </button>
+                   }
+                 >
+                   {userMenuItems.map((item) => (
+                     <Link
+                       key={item.name}
+                       href={item.href}
+                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                     >
+                       <item.icon className="w-4 h-4" />
+                       {item.name}
+                     </Link>
+                   ))}
+                   <button
+-                    onClick={() => setIsLoggedIn(false)}
++                    onClick={handleLogout}
+                     className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full text-left"
+                   >
+                     <LogOut className="w-4 h-4" />
+-                    Logout
++                    {t('logout')}
+                   </button>
+                 </Dropdown>
+               </>
+             ) : (
+               <div className="flex items-center space-x-3">
+-                <Button variant="ghost" href="/login">
+-                  Login
++                <Button variant="ghost" href={`/${locale}/login`}>
++                  {t('login')}
+                 </Button>
+-                <Button href="/register">
+-                  Sign Up
++                <Button href={`/${locale}/register`}>
++                  {t('register')}
+                 </Button>
+               </div>
+             )}
+@@ .. @@
+           {/* Mobile Navigation */}
+           <div className="md:hidden">
+             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+               {navigation.map((item) => (
+                 <Link
+                   key={item.name}
+                   href={item.href}
+-                  className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
++                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
++                    pathname === item.href
++                      ? 'text-blue-600 bg-blue-50'
++                      : 'text-gray-600 hover:text-gray-900'
++                  }`}
+                 >
+                   {item.name}
+                 </Link>
+               ))}
+             </div>
+             
+-            {isLoggedIn ? (
++            {isAuthenticated ? (
+               <div className="pt-4 pb-3 border-t border-gray-200">
+                 <div className="flex items-center px-5">
+-                  <Avatar size="sm" />
++                  <Avatar 
++                    src={user?.avatar} 
++                    alt={user?.username} 
++                    size="sm" 
++                  />
+                   <div className="ml-3">
+-                    <div className="text-base font-medium text-gray-800">John Doe</div>
+-                    <div className="text-sm font-medium text-gray-500">john@example.com</div>
++                    <div className="text-base font-medium text-gray-800">
++                      {user?.firstName} {user?.lastName}
++                    </div>
++                    <div className="text-sm font-medium text-gray-500">{user?.email}</div>
+                   </div>
+                 </div>
+                 <div className="mt-3 px-2 space-y-1">
+                   {userMenuItems.map((item) => (
+                     <Link
+                       key={item.name}
+                       href={item.href}
+                       className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                     >
+                       <item.icon className="w-5 h-5" />
+                       {item.name}
+                     </Link>
+                   ))}
+                   <button
+-                    onClick={() => setIsLoggedIn(false)}
++                    onClick={handleLogout}
+                     className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors w-full text-left"
+                   >
+                     <LogOut className="w-5 h-5" />
+-                    Logout
++                    {t('logout')}
+                   </button>
+                 </div>
+               </div>
+             ) : (
+               <div className="pt-4 pb-3 border-t border-gray-200 px-2 space-y-1">
+-                <Button variant="ghost" href="/login" className="w-full justify-start">
+-                  Login
++                <Button variant="ghost" href={`/${locale}/login`} className="w-full justify-start">
++                  {t('login')}
+                 </Button>
+-                <Button href="/register" className="w-full justify-start">
+-                  Sign Up
++                <Button href={`/${locale}/register`} className="w-full justify-start">
++                  {t('register')}
+                 </Button>
+               </div>
+             )}
